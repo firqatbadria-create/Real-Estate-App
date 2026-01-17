@@ -1,48 +1,34 @@
-// import React from "react";
-// import { Routes, Route } from "react-router-dom";
-
-// import Navbar from "./components/layout/Navbar";
-// import Footer from "./components/layout/Footer";
-
-// import Home from "./pages/Home";
-// import About from "./pages/About";
-
-// export default function App() {
-//   return (
-//     <>
-//       <Navbar />
-
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/about" element={<About />} />
-//       </Routes>
-
-//       <Footer />
-//     </>
-//   );
-// }
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-
-import Navbar from "./Components/layout/Navbar";
-import Footer from "./Components/layout/Footer";
-
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Login from "./pages/Login";
+import Navbar from "./Components/Navbar";
+import HeroSection from "./Components/HeroSection";
+import TrustedSection from "./Components/TrustedSection";
+import FeaturesSection from "./Components/FeaturesSection";
+import OptimizeSection from "./Components/OptimizeSection";
+import AnalyticsShowcase from "./Components/AnalyticsShowcase";
+import EasyScal from "./EasyScal";
+import ColeburatingTools from "./Components/ColeburatingTools";
+import FAQSection from "./Components/FAQSection";
+import RMBOSection from "./Components/RMBOSection";
+import RMBO1Section from "./Components/RMBO1Section";
+import FreeTrialCTA from "./Components/FreeTrialCTA";
+import Footer from "./Components/Footer";
 
 export default function App() {
   return (
-    <>
+    <div>
       <Navbar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-
+      <HeroSection />
+      <TrustedSection />
+      <FeaturesSection />
+      <OptimizeSection />
+      <AnalyticsShowcase />
+      <EasyScal />
+      <ColeburatingTools />
+      <FAQSection />
+      <RMBOSection />
+      <RMBO1Section />
+      <FreeTrialCTA />
       <Footer />
-    </>
+    </div>
   );
 }

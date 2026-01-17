@@ -1,66 +1,20 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import Saatlogo from "../Components/images/saatlogo.svg";
 
-const menuConfig = [
+const pages = [
   { label: "Home", to: "/" },
-  { label: "About", to: "/about" },
-  {
-    label: "Buy",
-    to: "/buy",
-    dropdown: [
-      { label: "Buy Apartments", to: "/buy/apartments" },
-      { label: "Buy Houses", to: "/buy/houses" },
-      { label: "Buy Land", to: "/buy/land" },
-      { label: "New Listings", to: "/buy/new" },
-    ],
-  },
-  {
-    label: "Rent",
-    to: "/rent",
-    dropdown: [
-      { label: "Rent Apartments", to: "/rent/apartments" },
-      { label: "Rent Houses", to: "/rent/houses" },
-      { label: "Short-Term Rent", to: "/rent/short-term" },
-      { label: "Long-Term Rent", to: "/rent/long-term" },
-    ],
-  },
-  {
-    label: "Sell",
-    to: "/sell",
-    dropdown: [
-      { label: "List Property", to: "/sell/list" },
-      { label: "Selling Guide", to: "/sell/guide" },
-      { label: "Pricing / Valuation", to: "/sell/valuation" },
-    ],
-  },
-  {
-    label: "Agents",
-    to: "/agents",
-    dropdown: [
-      { label: "All Agents", to: "/agents/all" },
-      { label: "Top Rated", to: "/agents/top" },
-      { label: "Become an Agent", to: "/agents/join" },
-    ],
-  },
-  {
-    label: "Contact",
-    to: "/contact",
-    dropdown: [
-      { label: "Contact Us", to: "/contact" },
-      { label: "Support", to: "/contact/support" },
-      { label: "FAQ", to: "/contact/faq" },
-    ],
-  },
+  { label: "Services", to: "/services" },
+  { label: "Projects", to: "/projects" },
+  { label: "Careers", to: "/careers" },
 ];
 
-function cn(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+const cn = (...c) => c.filter(Boolean).join(" ");
 
-function Caret({ open }) {
+function Chevron({ open }) {
   return (
     <svg
-      className={cn("h-4 w-4 transition-transform", open ? "rotate-180" : "")}
+      className={cn("h-4 w-4 transition-transform", open && "rotate-180")}
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-hidden="true"
@@ -74,134 +28,27 @@ function Caret({ open }) {
   );
 }
 
-function NavLink({ to, children, className = "", onClick }) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={cn(
-        "font-semibold text-gray-900 hover:text-gray-700 transition",
-        className
-      )}
-    >
-      {children}
-    </Link>
-  );
-}
-
-function DesktopDropdown({ item, open, setOpen, closeAll }) {
-  return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 px-4 py-2 font-semibold text-gray-900 hover:text-gray-700 transition"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={(e) => {
-          e.preventDefault();
-          setOpen((v) => !v);
-        }}
-      >
-        {item.label}
-        <Caret open={open} />
-      </button>
-
-      <div
-        className={cn(
-          "absolute left-0 top-full mt-2 w-60 rounded-xl bg-white shadow-xl ring-1 ring-black/5",
-          "origin-top opacity-0 scale-95 pointer-events-none transition duration-150",
-          open && "opacity-100 scale-100 pointer-events-auto"
-        )}
-        role="menu"
-      >
-        <div className="py-2">
-          {item.dropdown.map((d) => (
-            <Link
-              key={d.to}
-              to={d.to}
-              className="block rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition"
-              onClick={closeAll}
-              role="menuitem"
-            >
-              {d.label}
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MobileDropdown({ item, open, onToggle, onNavigate }) {
-  return (
-    <div className="w-full">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="w-full flex items-center justify-between py-3 font-semibold text-gray-900"
-        aria-haspopup="menu"
-        aria-expanded={open}
-      >
-        <span>{item.label}</span>
-        <Caret open={open} />
-      </button>
-
-      <div
-        className={cn(
-          "grid overflow-hidden transition-[grid-template-rows] duration-200",
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        )}
-      >
-        <div className="min-h-0">
-          <div className="pl-3 pb-2">
-            {item.dropdown.map((d) => (
-              <Link
-                key={d.to}
-                to={d.to}
-                className="block rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition"
-                onClick={onNavigate}
-              >
-                {d.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const [openMenu, setOpenMenu] = useState(null);
-
+  const [pagesOpen, setPagesOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileOpenMenu, setMobileOpenMenu] = useState(null);
-
   const navRef = useRef(null);
 
-  const desktopItems = useMemo(() => menuConfig, []);
-
   const closeAll = () => {
-    setOpenMenu(null);
+    setPagesOpen(false);
     setMobileOpen(false);
-    setMobileOpenMenu(null);
   };
 
+  // Close on outside click
   useEffect(() => {
-    const onDocClick = (e) => {
+    const onDown = (e) => {
       if (!navRef.current) return;
       if (!navRef.current.contains(e.target)) closeAll();
     };
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  // Close on ESC
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") closeAll();
@@ -210,207 +57,241 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
+  const linkBase =
+    "text-white/90 hover:text-white transition font-medium px-3 py-2 rounded-xl";
+  const active = "text-white bg-white/10 ring-1 ring-white/10";
+
   return (
-    // ✅ Sticky + z-index belongs here
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur border-b border-gray-100">
-      <div ref={navRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3" onClick={closeAll}>
-            <div className="flex items-center">
-              <svg
-                width="54"
-                height="40"
-                viewBox="0 0 54 40"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-amber-700"
+    <header className="sticky top-0 z-50">
+      {/* Top gradient bar (optional like screenshot vibe) */}
+      <div className="h-[2px] w-full bg-gradient-to-r from-[#050b1e] via-[#0a1a3a] to-[#1a3cff]" />
+
+      <div className="bg-gradient-to-r from-[#050b1e] via-[#0a1a3a] to-[#1a3cff]">
+        <div ref={navRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-20 items-center justify-between">
+            {/* Logo */}
+            <img src={Saatlogo} alt="Saatosa Logo" className="h-10 w-auto" />
+            {/* <Link to="/" className="flex items-center gap-3" onClick={closeAll}> */}
+            {/* </Link> */}
+
+            {/* Desktop nav */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {/* Pages dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => setPagesOpen(true)}
+                onMouseLeave={() => setPagesOpen(false)}
               >
-                <path
-                  d="M3 20L27 3L51 20"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M9 18V37H45V18"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M17 37V24H37V37"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+                <button
+                  type="button"
+                  className={cn(linkBase, "inline-flex items-center gap-2")}
+                  aria-haspopup="menu"
+                  aria-expanded={pagesOpen}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPagesOpen((v) => !v);
+                  }}
+                >
+                  Pages <Chevron open={pagesOpen} />
+                </button>
+
+                <div
+                  className={cn(
+                    "absolute left-0 top-full mt-3 w-60 rounded-2xl bg-[#0f1a30] shadow-2xl ring-1 ring-white/10",
+                    "origin-top opacity-0 scale-95 pointer-events-none transition duration-250",
+                    pagesOpen && "opacity-100 scale-100 pointer-events-auto"
+                  )}
+                  role="menu"
+                >
+                  <div className="p-2">
+                    {pages.map((p) => (
+                      <NavLink
+                        key={p.to}
+                        to={p.to}
+                        role="menuitem"
+                        onClick={closeAll}
+                        className={({ isActive }) =>
+                          cn(
+                            "block rounded-xl px-4 py-3 text-sm text-white/90 hover:text-white hover:bg-white/10 transition",
+                            isActive && "bg-white/10 text-white"
+                          )
+                        }
+                      >
+                        {p.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <NavLink
+                to="/about"
+                onClick={closeAll}
+                className={({ isActive }) => cn(linkBase, isActive && active)}
+              >
+                About us
+              </NavLink>
+
+              <NavLink
+                to="/features"
+                onClick={closeAll}
+                className={({ isActive }) => cn(linkBase, isActive && active)}
+              >
+                Features
+              </NavLink>
+
+              <NavLink
+                to="/pricing"
+                onClick={closeAll}
+                className={({ isActive }) => cn(linkBase, isActive && active)}
+              >
+                Pricing
+              </NavLink>
+            </nav>
+
+            {/* CTA */}
+            <div className="hidden lg:flex items-center gap-3">
+              <Link
+                to="/contact"
+                onClick={closeAll}
+                className="inline-flex items-center gap-2 rounded-2xl bg-sky-500 px-6 py-3 text-white font-semibold shadow-lg shadow-sky-500/20 hover:bg-sky-400 transition"
+              >
+                Contact
+                <span aria-hidden="true">↗</span>
+              </Link>
             </div>
-            <span className="text-2xl font-extrabold tracking-tight text-amber-800">
-              SunTower
-            </span>
-          </Link>
 
-          {/* Desktop menu */}
-          <nav className="hidden lg:flex items-center gap-2">
-            {desktopItems.map((item) => {
-              const hasDropdown = Array.isArray(item.dropdown);
-
-              if (!hasDropdown) {
-                return (
-                  <NavLink
-                    key={item.label}
-                    to={item.to}
-                    className="px-4 py-2"
-                    onClick={closeAll}
-                  >
-                    {item.label}
-                  </NavLink>
-                );
-              }
-
-              const open = openMenu === item.label;
-
-              return (
-                <DesktopDropdown
-                  key={item.label}
-                  item={item}
-                  open={open}
-                  setOpen={(v) => setOpenMenu(v ? item.label : null)}
-                  closeAll={closeAll}
-                />
-              );
-            })}
-          </nav>
-
-          {/* Desktop right buttons */}
-          <div className="hidden lg:flex items-center gap-5">
-            {!isLoggedIn ? (
-              <button
-                onClick={() => setIsLoggedIn(true)}
-                className="rounded-2xl bg-neutral-900 px-10 py-3 text-white font-bold shadow-sm hover:bg-neutral-800 transition"
+            {/* Mobile button */}
+            <button
+              className="lg:hidden inline-flex items-center justify-center rounded-2xl p-2 text-white/90 hover:text-white hover:bg-white/10 transition"
+              onClick={() => {
+                setMobileOpen((v) => !v);
+                setPagesOpen(false);
+              }}
+              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+            >
+              <svg
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                Login
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsLoggedIn(false)}
-                className="rounded-2xl bg-neutral-900 px-10 py-3 text-white font-bold shadow-sm hover:bg-neutral-800 transition"
-              >
-                Log out
-              </button>
-            )}
+                {mobileOpen ? (
+                  <>
+                    <path d="M18 6 6 18" />
+                    <path d="M6 6l12 12" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M4 6h16" />
+                    <path d="M4 12h16" />
+                    <path d="M4 18h16" />
+                  </>
+                )}
+              </svg>
+            </button>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden inline-flex items-center justify-center rounded-xl p-2 hover:bg-gray-100 transition"
-            onClick={() => {
-              setMobileOpen((v) => !v);
-              setMobileOpenMenu(null);
-              setOpenMenu(null);
-            }}
-            aria-label="Toggle menu"
-            aria-expanded={mobileOpen}
+          {/* Mobile panel */}
+          <div
+            className={cn(
+              "lg:hidden overflow-hidden transition-[max-height] duration-200",
+              mobileOpen ? "max-h-[520px]" : "max-h-0"
+            )}
           >
-            <svg
-              className="h-6 w-6 text-gray-900"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              {mobileOpen ? (
-                <>
-                  <path d="M18 6 6 18" />
-                  <path d="M6 6l12 12" />
-                </>
-              ) : (
-                <>
-                  <path d="M4 6h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 18h16" />
-                </>
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
+            <div className="pb-5">
+              <div className="mt-2 rounded-2xl border border-white/10 bg-white/5 p-3">
+                {/* Pages accordion */}
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between rounded-xl px-3 py-3 text-white/90 hover:text-white hover:bg-white/10 transition font-medium"
+                  onClick={() => setPagesOpen((v) => !v)}
+                  aria-expanded={pagesOpen}
+                >
+                  Pages <Chevron open={pagesOpen} />
+                </button>
 
-      {/* Mobile panel */}
-      <div
-        className={cn(
-          "lg:hidden overflow-hidden bg-white border-t border-gray-100",
-          "transition-[max-height] duration-200",
-          mobileOpen ? "max-h-[700px]" : "max-h-0"
-        )}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
-          <nav className="flex flex-col">
-            {menuConfig.map((item) => {
-              const hasDropdown = Array.isArray(item.dropdown);
+                <div
+                  className={cn(
+                    "grid transition-[grid-template-rows] duration-200",
+                    pagesOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                  )}
+                >
+                  <div className="min-h-0">
+                    <div className="pt-1">
+                      {pages.map((p) => (
+                        <NavLink
+                          key={p.to}
+                          to={p.to}
+                          onClick={closeAll}
+                          className={({ isActive }) =>
+                            cn(
+                              "block rounded-xl px-3 py-3 text-sm text-white/85 hover:text-white hover:bg-white/10 transition",
+                              isActive && "bg-white/10 text-white"
+                            )
+                          }
+                        >
+                          {p.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-              if (!hasDropdown) {
-                return (
-                  <NavLink
-                    key={item.label}
-                    to={item.to}
-                    className="py-3"
-                    onClick={closeAll}
-                  >
-                    {item.label}
-                  </NavLink>
-                );
-              }
-
-              const open = mobileOpenMenu === item.label;
-
-              return (
-                <MobileDropdown
-                  key={item.label}
-                  item={item}
-                  open={open}
-                  onToggle={() =>
-                    setMobileOpenMenu((cur) =>
-                      cur === item.label ? null : item.label
+                <NavLink
+                  to="/about"
+                  onClick={closeAll}
+                  className={({ isActive }) =>
+                    cn(
+                      "block rounded-xl px-3 py-3 text-white/90 hover:text-white hover:bg-white/10 transition font-medium",
+                      isActive && "bg-white/10 text-white"
                     )
                   }
-                  onNavigate={closeAll}
-                />
-              );
-            })}
+                >
+                  About us
+                </NavLink>
 
-            {/* Mobile auth buttons */}
-            <div className="mt-4 flex gap-3">
-              {!isLoggedIn ? (
-                <button
-                  onClick={() => {
-                    setIsLoggedIn(true);
-                    closeAll();
-                  }}
-                  className="w-full rounded-2xl bg-neutral-900 px-6 py-3 text-white font-bold hover:bg-neutral-800 transition"
+                <NavLink
+                  to="/features"
+                  onClick={closeAll}
+                  className={({ isActive }) =>
+                    cn(
+                      "block rounded-xl px-3 py-3 text-white/90 hover:text-white hover:bg-white/10 transition font-medium",
+                      isActive && "bg-white/10 text-white"
+                    )
+                  }
                 >
-                  Login
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setIsLoggedIn(false);
-                    closeAll();
-                  }}
-                  className="w-full rounded-2xl bg-neutral-900 px-6 py-3 text-white font-bold hover:bg-neutral-800 transition"
+                  Features
+                </NavLink>
+
+                <NavLink
+                  to="/pricing"
+                  onClick={closeAll}
+                  className={({ isActive }) =>
+                    cn(
+                      "block rounded-xl px-3 py-3 text-white/90 hover:text-white hover:bg-white/10 transition font-medium",
+                      isActive && "bg-white/10 text-white"
+                    )
+                  }
                 >
-                  Log out
-                </button>
-              )}
+                  Pricing
+                </NavLink>
+
+                <Link
+                  to="/contact"
+                  onClick={closeAll}
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 px-6 py-3 text-white font-semibold hover:bg-sky-400 transition"
+                >
+                  Contact <span aria-hidden="true">↗</span>
+                </Link>
+              </div>
             </div>
-          </nav>
+          </div>
+          {/* end mobile */}
         </div>
       </div>
     </header>
